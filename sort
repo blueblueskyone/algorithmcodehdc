@@ -1,0 +1,137 @@
+#排序算法
+1、合并有序数组
+给定两个排序后的数组 A 和 B，其中 A 的末端有足够的缓冲空间容纳 B。 编写一个方法，将 B 合并入 A 并排序。
+初始化 A 和 B 的元素数量分别为 m 和 n。
+#不开辟新空间
+class Solution:
+    def merge(self, A: List[int], m: int, B: List[int], n: int) -> None:
+        """
+        Do not return anything, modify A in-place instead.
+        """
+
+        #不开辟空间
+        tmp=m+n
+        while m>0 and n>0:
+            if A[m-1]>B[n-1]:
+                A[tmp-1]=A[m-1]
+                m=m-1
+                tmp=tmp-1
+            else:
+                A[tmp-1]=B[n-1]
+                n=n-1
+                tmp=tmp-1
+        if m==0:
+            for i in range(tmp):
+                A[i]=B[i]
+                
+2、有序数组的平方
+给你一个按 非递减顺序 排序的整数数组 nums，返回 每个数字的平方 组成的新数组，要求也按 非递减顺序 排序。
+class Solution:
+    def sortedSquares(self, nums: List[int]) -> List[int]:
+
+         k=len(nums)
+         tmp=[0]*k
+         i=0
+         j=k-1
+         while k>0:
+             if nums[i]*nums[i]>=nums[j]*nums[j]:
+                 tmp[k-1]=nums[i]*nums[i]
+                 i=i+1
+                 k=k-1
+             else:
+                 tmp[k-1]=nums[j]*nums[j]
+                 j=j-1
+                 k=k-1
+         return tmp
+ 3、最短无序连续子数组
+ #先排序（快排复杂度nlogn)
+给你一个整数数组 nums ，你需要找出一个 连续子数组 ，如果对这个子数组进行升序排序，那么整个数组都会变为升序排序。
+请你找出符合题意的 最短 子数组，并输出它的长度。
+class Solution:
+    def findUnsortedSubarray(self, nums: List[int]) -> int:
+        
+        k=len(nums)
+        l=0
+        r=k-1
+        
+        n = len(nums)
+        def isSorted() -> bool:
+            for i in range(1, n):
+                if nums[i - 1] > nums[i]:
+                    return False
+            return True
+        
+        if isSorted():
+            return 0
+        
+        numsSorted = sorted(nums)
+
+        while l<=k-1: 
+            if nums[l]==numsSorted[l]:
+                 l=l+1
+            else:
+                break
+        while r>=0:
+            if  nums[r]==numsSorted[r]:
+                r=r-1
+            else:
+                break
+        return r-l+1
+4、非递增顺序的最小子序列
+给你一个数组 nums，请你从中抽取一个子序列，满足该子序列的元素之和 严格 大于未包含在该子序列中的各元素之和。
+如果存在多个解决方案，只需返回 长度最小 的子序列。如果仍然有多个解决方案，则返回 元素之和最大 的子序列。
+与子数组不同的地方在于，「数组的子序列」不强调元素在原数组中的连续性，也就是说，它可以通过从数组中分离一些（也可能不分离）元素得到。
+注意，题目数据保证满足所有约束条件的解决方案是 唯一 的。同时，返回的答案应当按 非递增顺序 排列。
+#先排序（快排复杂度nlogn)
+class Solution:
+    def minSubsequence(self, nums: List[int]) -> List[int]:
+
+
+        nums.sort(reverse=True)
+
+        k=len(nums)
+
+        sum1=0
+        for i in range(k):
+            sum1=sum1+nums[i]
+
+        tmp1=0
+        for i in range(k):
+            tmp1=tmp1+nums[i]
+            if tmp1>sum1/2:
+                return nums[:i+1]
+            else:
+                continue
+  5、最小的k个数
+  输入整数数组 arr ，找出其中最小的 k 个数。例如，输入4、5、1、6、2、7、3、8这8个数字，则最小的4个数字是1、2、3、4。
+  class Solution:
+    def getLeastNumbers(self, arr: List[int], k: int) -> List[int]:
+
+
+        if k >= len(arr): 
+            return arr
+
+        def quick_sort(l, r):
+
+            i, j = l, r
+
+            while i < j:
+
+                while i < j and arr[j] >= arr[l]: j -= 1
+
+                while i < j and arr[i] <= arr[l]: i += 1
+
+                arr[i], arr[j] = arr[j], arr[i]
+
+            arr[l], arr[i] = arr[i], arr[l]
+
+            #不断递归排序
+
+            if k < i: return quick_sort(l, i - 1)
+
+            if k > i: return quick_sort(i + 1, r)
+
+            return arr[:k]
+
+        return quick_sort(0, len(arr) - 1)
+
