@@ -1,0 +1,328 @@
+#链表
+1、链表定义
+class ListNode:
+     def __init__(self, x):
+         self.val = x
+         self.next = None
+或者
+class ListNode:
+     def __init__(self, val=0, next=None):
+         self.val = val
+         self.next = next
+         
+2、链表题型
+0）反转链表
+思路：改变链表转向,每次只改变一个链表指向，然后不断向前
+class Solution:
+    def reverseList(self, head: ListNode) -> ListNode:
+
+
+        pre=None
+
+        while head:
+
+
+            #保存下一个节点
+            tmp=head.next
+
+            #当前节点指向前一个节点
+            head.next=pre
+
+            pre=head
+
+            head=tmp
+
+        return pre
+
+1）环形链表
+思路：利用字典结构保存，判断元素是否出现过确定是否环形
+class Solution:
+    def detectCycle(self, head: ListNode) -> ListNode:
+        d={}
+        while head:
+            if head not in d:
+                d[head]=1
+                head=head.next
+            else:
+                return head
+        return None
+        
+class Solution:
+    def hasCycle(self, head: Optional[ListNode]) -> bool:
+
+
+        d={}
+        while head:
+            if head not in d:
+                d[head]=1
+                head=head.next
+            else:
+                return True
+        return False
+
+2）回文
+思路：遍历保存链表值，判断反转后是否相同确定是否回文，注意是l==l[::-1]
+class Solution:
+    def isPalindrome(self, head: ListNode) -> bool:
+
+        l=[]
+        while head:
+             l.append(head.val)
+             head=head.next
+        return l==l[::-1]
+
+3)相交链表
+思路：利用字典结构保存其中一个链表的数据，再判断第二个链表是否在第一个链表中
+class Solution:
+    def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> ListNode:
+
+
+        pa=headA
+        pb=headB
+
+        d={}
+        while pa:
+              if pa not in d:
+                  d[pa]=1
+              pa=pa.next
+        
+        while pb:
+            if pb not in d:
+                pb=pb.next
+            else:
+                return pb
+        return None
+        
+4）排序链表
+思路：先取出元素，再排序，再构造链表
+  class Solution:
+    def sortList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+
+
+        #链表排序
+        
+        l=[]
+
+        p=head
+
+        while p:
+            l.append(p.val)
+            p=p.next
+
+        l.sort()
+
+        p1=ListNode(0)
+        result=p1
+
+        for i in range(len(l)):
+            p1.next=ListNode(l[i])
+            p1=p1.next
+
+        return result.next
+        
+  5）合并两个有序链表
+  思路：判断大小，不断向后
+  class Solution:
+    def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
+
+
+        p=ListNode(0)
+        result=p
+         
+
+        while list1 and list2:
+            v1=list1.val
+            v2=list2.val
+
+            if v1<=v2:
+                list1=list1.next
+                tmp=ListNode(v1)
+                p.next=tmp
+                p=p.next
+            else:
+                list2=list2.next
+                tmp=ListNode(v2)
+                p.next=tmp
+                p=p.next
+        if list1:
+            p.next=list1
+        if list2:
+            p.next=list2
+
+        return result.next
+
+  6）合并K个有序链表
+  从左到右合并
+  class Solution:
+    def mergeKLists(self, lists: List[ListNode]) -> ListNode:
+        
+
+        def  merge2Lists(l1,l2):
+
+            p=ListNode(0)
+            result=p
+
+            while l1 and l2:
+                if l1.val<=l2.val:
+                    p.next=l1
+                    l1=l1.next
+                else:
+                    p.next=l2
+                    l2=l2.next
+                p=p.next
+            if l1:
+                p.next=l1
+            if l2:
+                p.next=l2
+            
+            return result.next
+
+        #从左到右合并
+        k=len(lists)
+        if k==0:
+            return 
+        if k==1:
+            return lists[0]
+        for i in range(k-1):
+            l=merge2Lists(lists[i],lists[i+1])
+            lists[i+1]=l
+
+        return l
+  
+  分治合并
+  class Solution:
+    def mergeKLists(self, lists: List[ListNode]) -> ListNode:
+        
+        #0、定义两个链表合并
+        def  merge2Lists(l1,l2):
+
+            p=ListNode(0)
+            result=p
+
+            while l1 and l2:
+                if l1.val<=l2.val:
+                    p.next=l1
+                    l1=l1.next
+                else:
+                    p.next=l2
+                    l2=l2.next
+                p=p.next
+            if l1:
+                p.next=l1
+            if l2:
+                p.next=l2
+            
+            return result.next
+
+        #1定义分治过程中的merge
+        def merge_sort(lists,l,r):
+            if l==r:
+                return lists[l]
+            mid=(l+r)//2
+            L=merge_sort(lists, l, mid)
+            R=merge_sort(lists, mid + 1, r)
+            return merge2Lists(L, R)
+
+        k=len(lists)
+        if k==0:
+            return 
+        if k==1:
+            return lists[0]
+        return merge_sort(lists,0,len(lists)-1)
+  
+  利用堆，先构造，再利用堆的函数POP出最小元素
+  class Solution:
+    def mergeKLists(self, lists: List[ListNode]) -> ListNode:
+        
+        if not lists:
+            return None
+
+        minHeap = []
+        for x in lists:
+            while x:
+                heapq.heappush(minHeap, x.val)
+                x = x.next
+        
+        dummy = ListNode(-1)
+        x = dummy
+        while minHeap:
+            x.next = ListNode(heapq.heappop(minHeap))
+            x = x.next
+        return dummy.next
+        
+  7）两数相加
+  class Solution:
+    def addTwoNumbers(self, l1: ListNode, l2: ListNode) -> ListNode:
+
+        p=ListNode(0)
+        result=p
+        tmp1=0
+
+        while l1 and l2:
+            val1=l1.val
+            val2=l2.val
+            tmp=val1+val2+tmp1
+            tmp0=tmp%10
+            tmp1=tmp//10
+            tmpmode=ListNode(tmp0)
+            p.next=tmpmode
+            p=p.next
+            l1=l1.next
+            l2=l2.next
+        if l1:
+            while l1:
+                val1=l1.val
+                tmp=val1+tmp1
+                tmp0=tmp%10
+                tmp1=tmp//10
+                tmpmode=ListNode(tmp0)
+                p.next=tmpmode
+                p=p.next
+                l1=l1.next
+        if l2:
+            while l2:
+                val2=l2.val
+                tmp=val2+tmp1
+                tmp0=tmp%10
+                tmp1=tmp//10
+                tmpmode=ListNode(tmp0)
+                p.next=tmpmode
+                p=p.next
+                l2=l2.next
+        if tmp1>0:
+             tmpmode=ListNode(tmp1)
+             p.next=tmpmode
+
+        return result.next
+ 
+8）删除倒数第N个元素
+思路：需要三个指针，pre slow fast
+class Solution:
+    def removeNthFromEnd(self, head: ListNode, n: int) -> ListNode:
+
+
+        #删除倒数第n个节点
+        pre=ListNode(0)
+        pre.next=head
+        result=pre
+        fast=head
+        slow=head
+
+        while n>0:
+
+            fast=fast.next
+            n=n-1
+        
+        while fast:
+            fast=fast.next
+            slow=slow.next
+            pre=pre.next
+        
+        pre.next=slow.next
+
+        return result.next
+  
+  
+  
+  
+
